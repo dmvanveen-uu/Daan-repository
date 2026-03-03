@@ -14,6 +14,7 @@ print("Hello world!")
 ########## CODE TO EXTRACT NAMES FROM FILE #######################
 ##################################################################
 
+
 import csv
 
 # get name of file, add .csv if the user hasn't
@@ -37,7 +38,8 @@ for row in csvreader:
         firstrow = False
         continue
     names.append(row[1])
-print(f"These are the names entered: {names}")
+print(f"These are a total of {len(names)} names entered, these are the names: {names}")
+
 
 ##################################################################
 ##################################################################
