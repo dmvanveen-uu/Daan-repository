@@ -1,4 +1,10 @@
-print("Hello world!")
+# print("Hello world!")
+
+# CHANGELOG:
+
+#v1.1 Jeroen added the existing code into this file
+# v1: Daan created a new import function
+
 
 #Hello Omar and Jeroen!
 
