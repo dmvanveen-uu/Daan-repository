@@ -2,6 +2,7 @@
 
 # CHANGELOG:
 
+#v1.2 Jeroen added link to google form
 #v1.1 Jeroen added parts of the existing code into this file
 # v1: Daan created a new import function
 
@@ -22,9 +23,20 @@ import random
 import copy
 import os
 
+# Start by presenting the Google form to the user to fill out
+
+print("Welcome to our matching algorithm! To start, you can share this form to fill out by the users.")
+print("After filling this form out, please hit enter to receive the link to download the CSV file")
+print("https://docs.google.com/forms/d/e/1FAIpQLSd6CeVgLXvRE5YGlkfYEkanezgUMk_-0mmGZOGv39igk2e7Lg/viewform?usp=dialog")
+
+#
+
+
+
 ##################################################################
 ########## CODE TO EXTRACT NAMES FROM FILE #######################
 ##################################################################
+
 
 
 # get name of file, add .csv if the user hasn't
