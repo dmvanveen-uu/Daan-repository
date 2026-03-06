@@ -45,10 +45,6 @@ if not temp == "":
 if not participants_csv[len(participants_csv)-4:] == ".csv":
     participants_csv += ".csv"
 
-# header names in the CSV file (name and e-mail of participants)
-header_name = "Your name:"
-header_email = "Your e-mail:"
-
 # path to TXT file that stores the pairings of this round
 new_pairs_txt = "Coffee Partner Lottery new pairs.txt"
 
@@ -61,6 +57,7 @@ all_pairs_csv = "Coffee Partner Lottery all pairs.csv"
 # load participant's data
 formdata = pd.read_csv(participants_csv, sep=DELIMITER)
 print(pd.DataFrame(formdata))
-
+names = formdata[['What is your email address?']]
+print(names)
 
 
