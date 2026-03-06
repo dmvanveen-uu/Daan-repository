@@ -2,6 +2,7 @@
 
 # CHANGELOG:
 
+#v1.4 Daan replaced old import function with updated version of the existing one + 1 bug fix
 #v1.3 Jeroen added instructions to fill out and import the Google Form and CSV file    
 #v1.2 Jeroen added link to google form
 #v1.1 Jeroen added parts of the existing code into this file
@@ -35,52 +36,40 @@ print("You can import the .CSV file by:")
 print(" --> opening the link below")
 print("--> Go to file in the top left corner")
 print("--> Go to download")
-print("--> select the "seperated by comma's" .csv option')
+print('--> select the "seperated by comma\'s" .csv option')
 print("--> The file is now downloaded to your computer")
 print("--> Make sure the .csv file is in the same directory (folder) as this script")
 print("! Remember the file name, you will be asked to input the filename later in this script. A typo will result in an error in the script")
 
 print("https://docs.google.com/spreadsheets/d/1PpeRo5NwWtCWgkyHn9dRoUrztqWxIX0mFlPERe4WtIU/edit?usp=sharing")
 
+DELIMITER=','
 
 
+# get name of participant info file, add '.csv' if the user hasn't
+participants_csv = "coffee_form.csv"
+temp = input("What is the name of the csv file? ")
+if not temp == "":
+    participants_csv = temp
+if not participants_csv[len(participants_csv)-4:] == ".csv":
+    participants_csv += ".csv"
 
-##################################################################
-########## CODE TO EXTRACT NAMES FROM FILE #######################
-##################################################################
+# header names in the CSV file (name and e-mail of participants)
+header_name = "Your name:"
+header_email = "Your e-mail:"
 
+# path to TXT file that stores the pairings of this round
+new_pairs_txt = "Coffee Partner Lottery new pairs.txt"
 
+# path to CSV file that stores the pairings of this round
+new_pairs_csv = "Coffee Partner Lottery new pairs.csv"
 
-# get name of file, add .csv if the user hasn't
-filename = "coffee_form.csv"
-filename = input("What is the name of the csv file? ")
-if not filename[len(filename)-4:] == ".csv":
-    filename += ".csv"
+# path to CSV file that stores all pairings (to avoid repetition)
+all_pairs_csv = "Coffee Partner Lottery all pairs.csv"
 
-# open file and prep for reading the file
-print(f"Now opening {filename}.")
-openfile = open(filename, newline='')
-csvreader = csv.reader(openfile)
-
-#read all rows of the file and add the 2nd item (the name) to a list
-print("Now saving all the names from the file into a list.")
-names = []
-firstrow = True
-for row in csvreader:
-    #skip the first row, because that just contains the question
-    if firstrow:
-        firstrow = False
-        continue
-    names.append(row[1])
-print(f"These are a total of {len(names)} names entered, these are the names: {names}")
-
-
-
-
-
-##################################################################
-##################################################################
-##################################################################
+# load participant's data
+formdata = pd.read_csv(participants_csv, sep=DELIMITER)
+print(pd.DataFrame(formdata))
 
 
 
