@@ -1,8 +1,8 @@
-# print("Hello world!")
+
 
 # CHANGELOG:
 
-#v1.1 Jeroen added the existing code into this file
+#v1.1 Jeroen added parts of the existing code into this file
 # v1: Daan created a new import function
 
 
@@ -15,6 +15,12 @@
 
 # Kind regards, Daan!
 
+# imported from source code
+import pandas as pd
+import csv
+import random
+import copy
+import os
 
 ##################################################################
 ########## CODE TO EXTRACT NAMES FROM FILE #######################
@@ -45,6 +51,9 @@ for row in csvreader:
         continue
     names.append(row[1])
 print(f"These are a total of {len(names)} names entered, these are the names: {names}")
+
+
+
 
 
 ##################################################################
