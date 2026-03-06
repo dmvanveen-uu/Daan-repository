@@ -31,7 +31,7 @@ print("https://docs.google.com/forms/d/e/1FAIpQLSd6CeVgLXvRE5YGlkfYEkanezgUMk_-0
 print("After filling this form out, please hit enter to receive the link to download the CSV file")
 
 print("This Google Sheets doc below collected all the data from the Google Sheets mentioned above")
-print("You can import the .CSV file by:
+print("You can import the .CSV file by:")
 print(" --> opening the link below")
 print("--> Go to file in the top left corner")
 print("--> Go to download")
