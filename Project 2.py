@@ -27,8 +27,6 @@ import os
 ##################################################################
 
 
-import csv
-
 # get name of file, add .csv if the user hasn't
 filename = "coffee_form.csv"
 filename = input("What is the name of the csv file? ")
