@@ -1,0 +1,94 @@
+import pandas as pd
+import random
+import os
+
+print("Welcome to Mystery Coffee ")
+print("----------------------------------")
+print("1. Fill in the Google Form")
+print("2. Download the responses as CSV")
+print("3. Place the CSV file in this folder")
+print("----------------------------------\n")
+
+# load CSV file
+df = pd.read_csv("coffee_form.csv")
+
+# show columns (helps debugging)
+print("CSV columns:", df.columns)
+
+# extract names and emails
+names = list(df["What is your name?"])
+emails = list(df["What is your email address?"])
+
+participants = list(zip(names, emails))
+
+print("\nParticipants loaded:", len(participants))
+
+# choose group size
+group_size = int(input("Enter group size (2,3,4...): "))
+
+# randomize participants
+random.shuffle(participants)
+
+groups = []
+
+# create groups
+for i in range(0, len(participants), group_size):
+    groups.append(participants[i:i+group_size])
+
+# load conversation starters
+if os.path.exists("conversation_starters.txt"):
+    with open("conversation_starters.txt", "r") as f:
+        starters = f.readlines()
+else:
+    starters = [
+        "What hobby would you start if you had more time?",
+        "What is the best coffee you ever had?",
+        "If you could travel anywhere tomorrow, where would you go?",
+        "What skill would you like to learn this year?"
+    ]
+
+starter = random.choice(starters).strip()
+
+print("\nConversation Starter:")
+print(starter)
+
+print("\nGenerated Groups:\n")
+
+# print groups
+for i, group in enumerate(groups):
+
+    print("Group", i+1)
+
+    for person in group:
+        print("-", person[0], "(", person[1], ")")
+
+    print()
+
+# create messages folder if not exists
+if not os.path.exists("messages"):
+    os.mkdir("messages")
+
+# generate message files
+for i, group in enumerate(groups):
+
+    message = "Hello everyone,\n\n"
+    message += "You have been matched for Mystery Coffee!\n\n"
+
+    message += "Participants:\n"
+
+    for person in group:
+        message += "- " + person[0] + "\n"
+
+    message += "\nConversation starter:\n"
+    message += starter + "\n\n"
+
+    message += "Enjoy your coffee meeting!\n"
+
+    file_path = f"messages/group_{i+1}.txt"
+
+    with open(file_path, "w") as f:
+        f.write(message)
+
+print("Messages saved in 'messages' folder.")
+
+print("\nMystery Coffee finished successfully!")
