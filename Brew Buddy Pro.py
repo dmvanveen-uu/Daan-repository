@@ -1,6 +1,6 @@
 # CHANGELOG:
 
-
+#v1.7 Jeroen: Added a function (append/pop) to make the residual group more balanced. 
 #v1.6 Jeroen: Grabbed Omar's code and merged it with Project 2.py already on Daan's git repo. 
             # added def display_instructions(): for error handling if .csv is not found. 
             # Put .csv file in {} to make it dynamic..
@@ -94,6 +94,10 @@ groups = []
 # create groups
 for i in range(0, len(participants), group_size):
     groups.append(participants[i:i+group_size])
+
+# use pop to make sure the residual group is more balanced
+while len(groups) > 1 and len(groups[-1]) < len(groups[-2]) - 1:
+    groups[-1].append(groups[-2].pop())
 
 # load conversation starters
 if os.path.exists("conversation_starters.txt"):
