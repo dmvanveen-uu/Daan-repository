@@ -1,5 +1,6 @@
 # CHANGELOG:
 
+#v1.8 Daan: Making sure to match the filename to the output document name from google sheets, with user input as a backup
 #v1.7 Jeroen: Added a function (append/pop) to make the residual group more balanced. 
 #v1.6 Jeroen: Grabbed Omar's code and merged it with Project 2.py already on Daan's git repo. 
             # added def display_instructions(): for error handling if .csv is not found. 
@@ -20,8 +21,6 @@ import random
 import os
 
 
-# @daan can you make sure to match this filename below to the output document name from google sheets?
-participants_csv = "coffee_form.csv"
 
 # JB: Created a seperate function if .csv file is not loaded correctly with help guide.
 
@@ -62,15 +61,39 @@ print("----------------------------------\n")
 
 
 
+#making sure to match the filename to the output document name from google sheets, with user input as a backup
+participants_csv = "coffee_form.csv"
+
 df = None
 while df is None:
     try:
         df = pd.read_csv(participants_csv)
         print(f"Success: Loaded {len(df)} participants from {participants_csv}.")
     except FileNotFoundError:
-        print(f"Error: '{participants_csv}' not found.")
-        display_instructions()
-
+        participants_csv = "Project 2_ Brew Buddy! (Responses) - Formulierreacties 1.csv"
+        try:
+            df = pd.read_csv(participants_csv)
+            print(f"Success: Loaded {len(df)} participants from {participants_csv}.")
+        except FileNotFoundError:
+            participants_csv = "Project 2_ Brew Buddy! (Responses) - Scores.csv"
+            try:
+                df = pd.read_csv(participants_csv)
+                print(f"Success: Loaded {len(df)} participants from {participants_csv}.")
+            except FileNotFoundError:
+                #standard names not working, asking the user
+                print(f"Error: '{participants_csv}' not found.")
+                participants_csv = input("How did you name the .csv file? ")
+                try:
+                    df = pd.read_csv(participants_csv)
+                    print(f"Success: Loaded {len(df)} participants from {participants_csv}.")
+                except FileNotFoundError:
+                    participants_csv = participants_csv + ".csv"
+                    try:
+                        df = pd.read_csv(participants_csv)
+                        print(f"Success: Loaded {len(df)} participants from {participants_csv}.")
+                    except FileNotFoundError:
+                        print(f"Error: '{participants_csv}' not found.")
+                        display_instructions()
 
 # show columns (helps debugging)
 print("CSV columns:", df.columns)
