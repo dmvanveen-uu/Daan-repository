@@ -1,5 +1,6 @@
 # CHANGELOG:
 
+#v1.10 Daan: fixed a IndentationError
 #v1.9 Jeroen: Added a reminder to clear the google sheet responses after the script is run.
 #v1.8 Daan: Making sure to match the filename to the output document name from google sheets, with user input as a backup
 #v1.7 Jeroen: Added a function (append/pop) to make the residual group more balanced. 
@@ -110,18 +111,18 @@ print("\nParticipants loaded:", len(participants))
 # choose group size
 group_size = int(input("Enter group size (2,3,4...): "))
 
-    # randomize participants
-    random.shuffle(participants)
+# randomize participants
+random.shuffle(participants)
 
-    groups = []
+groups = []
 
-    # create groups
-    for i in range(0, len(participants), group_size):
-        groups.append(participants[i:i+group_size])
+# create groups
+for i in range(0, len(participants), group_size):
+    groups.append(participants[i:i+group_size])
 
-    # use pop to make sure the residual group is more balanced
-    while len(groups) > 1 and len(groups[-1]) < len(groups[-2]) - 1:
-        groups[-1].append(groups[-2].pop())
+# use pop to make sure the residual group is more balanced
+while len(groups) > 1 and len(groups[-1]) < len(groups[-2]) - 1:
+    groups[-1].append(groups[-2].pop())
 
 # load conversation starters
 if os.path.exists("conversation_starters.txt"):
