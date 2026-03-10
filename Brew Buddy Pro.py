@@ -1,5 +1,7 @@
 # CHANGELOG:
 
+#v2 Daan: Cleaned up some print statements. I think its time to commit to v2!
+#v1.11 Daan: combined seperate branch made by omar with this one + little bugfix
 #v1.10 Daan: fixed a IndentationError
 #v1.9 Jeroen: Added a reminder to clear the google sheet responses after the script is run.
 #v1.8 Daan: Making sure to match the filename to the output document name from google sheets, with user input as a backup
@@ -17,55 +19,53 @@
 
 
 
-
 import pandas as pd
 import random
 import os
 
 
 
+participants_csv = "coffeee.csv"
+new_pairs_csv = "new_pairs.csv"
+all_pairs_csv = "all_pairs.csv"
+
+DELIMITER = ";"
+
+
 # JB: Created a seperate function if .csv file is not loaded correctly with help guide.
-
 def display_instructions():
-    
-    print("\nWhoops, that didn't work! No worries, we'll guide you through the steps neccesary.")
-    print("\nFirst, make sure everyone who wants to participate filled out this form below:")
-    print("\nhttps://docs.google.com/forms/d/e/1FAIpQLSd6CeVgLXvRE5YGlkfYEkanezgUMk_-0mmGZOGv39igk2e7Lg/viewform?usp=dialog")
-
-    print("\nThis Google Sheets doc below collected all the data from the Google Form.")
-    print("\nhttps://docs.google.com/spreadsheets/d/1PpeRo5NwWtCWgkyHn9dRoUrztqWxIX0mFlPERe4WtIU/edit?usp=sharing")
-    print("Now you need to download this spreadsheet ({participants_csv}.csv) to your computer. ")
-    print("\nYou can import the .CSV file by:")
-    print("\n--> opening the link above in your browser")
-    print("\n--> Go to file in the top left corner")
-    print("\n--> Go to download")
-    print('\n--> select the "seperated by comma\'s" .csv option')
-    print("\n--> The file is now downloaded to your computer")
-    print("\n--> Make sure the .csv file is in the same directory (folder) as this script")
-    print("\n--> Make sure the file name matches {participants_csv}. You might need to change the filename. A typo will result in an error in the script")
-    input("\nDone? Press Enter to continue and run the script again.")
-    
+    print("\nCSV file not found.")
+    print("Follow these steps:")
+    print("1. Fill in the Google Form")
+    print("2. Download the responses as CSV")
+    print("3. Place the CSV file in the same folder as this script")
+    input("\nPress Enter when ready...")
 
 
-
-#####
-
-
-print("Welcome to Brewbuddy Pro! ")
+print("Welcome to BrewBuddy Pro")
 print("----------------------------------")
-print("\n1. Fill in the Google Form")
-print("https://docs.google.com/forms/d/e/1FAIpQLSd6CeVgLXvRE5YGlkfYEkanezgUMk_-0mmGZOGv39igk2e7Lg/viewform?usp=dialog")
-print("\n2. Download the responses as CSV")
-print("https://docs.google.com/spreadsheets/d/1PpeRo5NwWtCWgkyHn9dRoUrztqWxIX0mFlPERe4WtIU/edit?usp=sharing")
-print("\n3. Place the CSV file in the same folder as this Python script")
-input("\nDone? Press Enter to continue to run the script.")
+print("1. Let participants fill in the Google Form\n    (https://docs.google.com/forms/d/e/1FAIpQLSd6CeVgLXvRE5YGlkfYEkanezgUMk_-0mmGZOGv39igk2e7Lg/viewform?usp=dialog)")
+print("2. Download the responses as CSV\n    (https://docs.google.com/spreadsheets/d/1PpeRo5NwWtCWgkyHn9dRoUrztqWxIX0mFlPERe4WtIU/edit?usp=sharing)")
+print("3. Place the CSV file in this folder")
+input("\nPress Enter to continue...")
 print("----------------------------------\n")
+
+# load conversation starters
+if os.path.exists("conversation_starters.txt"):
+    with open("conversation_starters.txt", "r") as f:
+        starters = f.readlines()
+else:
+    starters = [
+        "What hobby would you start if you had more time?",
+        "What is the best coffee you ever had?",
+        "If you could travel anywhere tomorrow, where would you go?",
+        "What skill would you like to learn this year?"
+    ]
 
 
 
 #making sure to match the filename to the output document name from google sheets, with user input as a backup
 participants_csv = "coffee_form.csv"
-
 df = None
 while df is None:
     try:
@@ -83,7 +83,7 @@ while df is None:
                 print(f"Success: Loaded {len(df)} participants from {participants_csv}.")
             except FileNotFoundError:
                 #standard names not working, asking the user
-                print(f"Error: '{participants_csv}' not found.")
+                print("Error: File not found.")
                 participants_csv = input("How did you name the .csv file? ")
                 try:
                     df = pd.read_csv(participants_csv)
@@ -96,93 +96,112 @@ while df is None:
                     except FileNotFoundError:
                         print(f"Error: '{participants_csv}' not found.")
                         display_instructions()
+print()
 
-# show columns (helps debugging)
-print("CSV columns:", df.columns)
 
-# extract names and emails
+
+# Extract data
 names = list(df["What is your name?"])
 emails = list(df["What is your email address?"])
 
 participants = list(zip(names, emails))
 
-print("\nParticipants loaded:", len(participants))
+print("Participants:", len(participants))
 
-# choose group size
+
+# choose group size and number of rounds
 group_size = int(input("Enter group size (2,3,4...): "))
+rounds = int(input("How many rounds should be generated (2,3,4...): "))
 
-# randomize participants
-random.shuffle(participants)
 
-groups = []
+# assemble output for printout
+output_string = ""
+output_string += "------------------------\n"
+output_string += "Generated coffee groups:\n"
+output_string += "------------------------\n"
 
-# create groups
-for i in range(0, len(participants), group_size):
-    groups.append(participants[i:i+group_size])
 
-# use pop to make sure the residual group is more balanced
-while len(groups) > 1 and len(groups[-1]) < len(groups[-2]) - 1:
-    groups[-1].append(groups[-2].pop())
+# load previous pair history
+opairs = set()
 
-# load conversation starters
-if os.path.exists("conversation_starters.txt"):
-    with open("conversation_starters.txt", "r") as f:
-        starters = f.readlines()
-else:
-    starters = [
-        "What hobby would you start if you had more time?",
-        "What is the best coffee you ever had?",
-        "If you could travel anywhere tomorrow, where would you go?",
-        "What skill would you like to learn this year?"
-    ]
+if os.path.exists(all_pairs_csv):
+    with open(all_pairs_csv, "r") as file:
+        for line in file:
+            opairs.add(tuple(sorted(line.strip().split(DELIMITER))))
 
-starter = random.choice(starters).strip()
 
-print("\nConversation Starter:")
-print(starter)
+# open new pairs csv
+with open(new_pairs_csv, "w") as file:
 
-print("\nGenerated Groups:\n")
+    header = ["round", "group", "name", "email"]
+    file.write(DELIMITER.join(header) + "\n")
 
-# print groups
-for i, group in enumerate(groups):
+    for r in range(1, rounds + 1):
 
-    print("Group", i+1)
+        random.shuffle(participants)
 
-    for person in group:
-        print("-", person[0], "(", person[1], ")")
+        groups = []
 
-    print()
+        # create groups
+        for i in range(0, len(participants), group_size):
+            groups.append(participants[i:i+group_size])
 
-# create messages folder if not exists
-if not os.path.exists("messages"):
-    os.mkdir("messages")
+        output_string += f"\nRound {r}"
+        
+        starter = random.choice(starters).strip()
+        output_string += f"\nConversation Starter: {starter}\n\n"
 
-# generate message files
-for i, group in enumerate(groups):
 
-    message = "Hello everyone,\n\n"
-    message += "You have been matched for Mystery Coffee!\n\n"
+        for g in range(len(groups)):
 
-    message += "Participants:\n"
+            group = groups[g]
 
-    for person in group:
-        message += "- " + person[0] + "\n"
+            output_string += f"Group {g+1}: "
 
-    message += "\nConversation starter:\n"
-    message += starter + "\n\n"
+            emails_in_group = []
 
-    message += "Enjoy your coffee meeting!\n"
+            for person in group:
 
-    file_path = f"messages/group_{i+1}.txt"
+                name = person[0]
+                email = person[1]
 
-    with open(file_path, "w") as f:
-        f.write(message)
+                emails_in_group.append(email)
 
-print("Messages saved in 'messages' folder.")
+                output_string += f"{name} ({email}) "
 
-print("\nMystery Coffee finished successfully!")
-print("\n")
-print("\nIMPORTANT REMINDER:")
-print("\nTo use this script again for a new round, please make sure to CLEAR the Google Sheet responses:")
-print("\nhttps://docs.google.com/spreadsheets/d/1PpeRo5NwWtCWgkyHn9dRoUrztqWxIX0mFlPERe4WtIU/edit?usp=sharing")
+                # write row to CSV
+                file.write(f"{r}{DELIMITER}{g+1}{DELIMITER}{name}{DELIMITER}{email}\n")
 
+            output_string += "\n"
+
+            # store pair history
+            pair_key = tuple(sorted(emails_in_group))
+
+            if pair_key not in opairs:
+                opairs.add(pair_key)
+
+
+# write output to console
+print(output_string)
+
+
+# append history file
+mode = "w"
+
+
+with open(all_pairs_csv, mode) as file:
+
+    for pair in opairs:
+
+        for i in range(len(pair)):
+
+            if i < len(pair) - 1:
+                file.write(pair[i] + DELIMITER)
+            else:
+                file.write(pair[i] + "\n")
+
+
+print("\nPairings saved successfully.")
+print("New pairs file:", new_pairs_csv)
+print("History file:", all_pairs_csv)
+print("\nProgram finished.")
