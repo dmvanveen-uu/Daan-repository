@@ -1,6 +1,6 @@
 # CHANGELOG:
 
-#v2 Daan: Cleaned up some print statements. I think its time to commit to v2!
+#v2 Daan: Added error handling for input group_size and input rounds. I think its time to commit to v2!
 #v1.11 Daan: combined seperate branch made by omar with this one + little bugfix
 #v1.10 Daan: fixed a IndentationError
 #v1.9 Jeroen: Added a reminder to clear the google sheet responses after the script is run.
@@ -110,8 +110,19 @@ print("Participants:", len(participants))
 
 
 # choose group size and number of rounds
-group_size = int(input("Enter group size (2,3,4...): "))
-rounds = int(input("How many rounds should be generated (2,3,4...): "))
+group_size = 0
+rounds = 0
+while not group_size > 0:
+    try:
+        group_size = int(input("Enter group size (2,3,4...): "))
+    except:
+        print("Something went wrong with your input, try again.")
+while not rounds > 0:
+    try:
+        rounds = int(input("How many rounds should be generated (2,3,4...): "))
+    except:
+        print("Something went wrong with your input, try again.")
+
 
 
 # assemble output for printout
