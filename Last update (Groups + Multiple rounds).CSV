@@ -1,0 +1,143 @@
+import pandas as pd
+import random
+import os
+import csv
+
+participants_csv = "coffee_form.csv"
+new_pairs_csv = "new_pairs.csv"
+all_pairs_csv = "all_pairs.csv"
+
+DELIMITER = ";"
+
+
+def display_instructions():
+    print("\nCSV file not found.")
+    print("Follow these steps:")
+    print("1. Fill in the Google Form")
+    print("2. Download the responses as CSV")
+    print("3. Place the CSV file in the same folder as this script")
+    input("\nPress Enter when ready...")
+
+
+print("Welcome to BrewBuddy Pro")
+print("----------------------------------")
+print("1. Fill in the Google Form")
+print("2. Download the responses as CSV")
+print("3. Place the CSV file in this folder")
+input("\nPress Enter to continue...")
+print("----------------------------------\n")
+
+
+# Load CSV
+df = None
+while df is None:
+    try:
+        df = pd.read_csv(participants_csv)
+        print(f"Loaded {len(df)} participants.")
+    except FileNotFoundError:
+        display_instructions()
+
+
+# Extract data
+names = list(df["What is your name?"])
+emails = list(df["What is your email address?"])
+
+participants = list(zip(names, emails))
+
+print("Participants:", len(participants))
+
+
+# choose group size and number of rounds
+group_size = int(input("Enter group size (2,3,4...): "))
+rounds = int(input("How many rounds should be generated (2,3,4...): "))
+
+
+# assemble output for printout
+output_string = ""
+output_string += "------------------------\n"
+output_string += "Generated coffee groups:\n"
+output_string += "------------------------\n"
+
+
+# load previous pair history
+opairs = set()
+
+if os.path.exists(all_pairs_csv):
+    with open(all_pairs_csv, "r") as file:
+        for line in file:
+            opairs.add(tuple(sorted(line.strip().split(DELIMITER))))
+
+
+# open new pairs csv
+with open(new_pairs_csv, "w") as file:
+
+    header = ["round", "group", "name", "email"]
+    file.write(DELIMITER.join(header) + "\n")
+
+    for r in range(1, rounds + 1):
+
+        random.shuffle(participants)
+
+        groups = []
+
+        # create groups
+        for i in range(0, len(participants), group_size):
+            groups.append(participants[i:i+group_size])
+
+        output_string += f"\nRound {r}\n"
+
+        for g in range(len(groups)):
+
+            group = groups[g]
+
+            output_string += f"Group {g+1}: "
+
+            emails_in_group = []
+
+            for person in group:
+
+                name = person[0]
+                email = person[1]
+
+                emails_in_group.append(email)
+
+                output_string += f"{name} ({email}) "
+
+                # write row to CSV
+                file.write(f"{r}{DELIMITER}{g+1}{DELIMITER}{name}{DELIMITER}{email}\n")
+
+            output_string += "\n"
+
+            # store pair history
+            pair_key = tuple(sorted(emails_in_group))
+
+            if pair_key not in opairs:
+                opairs.add(pair_key)
+
+
+# write output to console
+print(output_string)
+
+
+# append history file
+if os.path.exists(all_pairs_csv):
+    mode = "a"
+else:
+    mode = "w"
+
+with open(all_pairs_csv, mode) as file:
+
+    for pair in opairs:
+
+        for i in range(len(pair)):
+
+            if i < len(pair) - 1:
+                file.write(pair[i] + DELIMITER)
+            else:
+                file.write(pair[i] + "\n")
+
+
+print("\nPairings saved successfully.")
+print("New pairs file:", new_pairs_csv)
+print("History file:", all_pairs_csv)
+print("\nProgram finished.")
