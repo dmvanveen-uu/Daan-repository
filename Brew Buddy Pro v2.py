@@ -1,5 +1,7 @@
 # CHANGELOG:
 
+#v2.3 Jeroen: Added more conversation starters (AI generated topics).
+#v2.2 Jeroen: Added the function (append/pop) (again)to make the residual group more balanced.
 #v2.1 Jeroen: Added a thank you message and a link to the google sheet responses as a reminder to clear the Google Sheets.
 #v2 Daan: Added error handling for input group_size and input rounds. I think its time to commit to v2!
 #v1.11 Daan: combined seperate branch made by omar with this one + little bugfix
@@ -17,7 +19,6 @@
 #v1.2 Jeroen added link to google form
 #v1.1 Jeroen added parts of the existing code into this file
 # v1: Daan created a new import function
-
 
 
 import pandas as pd
@@ -60,7 +61,13 @@ else:
         "What hobby would you start if you had more time?",
         "What is the best coffee you ever had?",
         "If you could travel anywhere tomorrow, where would you go?",
-        "What skill would you like to learn this year?"
+        "What skill would you like to learn this year?",
+        "What is a book or movie that completely changed your perspective?",
+        "If you had to eat one meal for the rest of your life, what would it be?",
+        "What is the most unexpected thing that happened to you this week?",
+        "If you could instantly become an expert in any subject, what would you choose?",
+        "What was your first job, and what did you learn from it?",
+        "What is a hidden talent you have that people usually do not know about?"
     ]
 
 
@@ -157,6 +164,11 @@ with open(new_pairs_csv, "w") as file:
         # create groups
         for i in range(0, len(participants), group_size):
             groups.append(participants[i:i+group_size])
+
+        # If the last group has only 1 person, move them to the previous group using pop and append
+        if len(groups) > 1 and len(groups[-1]) == 1:
+            last_group = groups.pop()
+            groups[-1].append(last_group[0])
 
         output_string += f"\nRound {r}"
         
