@@ -1,5 +1,8 @@
 # CHANGELOG:
 
+#v2.9 (FINAL VERSION) Jeroen: Tried to fix the saving all the matched pairs into the all_pairs.csv file, but it's not working. Added to known issues list.
+#v2.8 Jeroen: We already saved the old and new pairs.csv, but never actually wrote the bit to check the pairs against previous pairs. Added a function to check if any group already exists in history and if so, it will try to find new groups that do not exist in history. 
+#v2.7 Jeroen: Didn't like the messy solution for the topic starters in the .csv file, so I added a text file to the ouput as well, where the topic starter is listed at the top. Also made it better understandable for the user which output file to use.
 #v2.6 Jeroen: Added the topic starters to the output in the new_pairs.csv file. It is a bit of a messy solution but it works for now.
 #v2.5 Jeroen: I noticed we had unused code to add/read topic starters. Updated the function to ask the user if they want to use custom conversation starters.
 #v2.4 Jeroen: Did some visual and textual formatting for readability.
@@ -23,6 +26,8 @@
 #v1.1 Jeroen added parts of the existing code into this file
 # v1: Daan created a new import function
 
+# Known Issues:
+# - The script doesn't save all the matched pairs (only first round) into the all_pairs.csv file.
 
 import pandas as pd
 import random
@@ -32,6 +37,7 @@ import os
 
 participants_csv = "coffeee.csv"
 new_pairs_csv = "new_pairs.csv"
+new_pairs_txt = "Brew_Buddy_Groups.txt"
 all_pairs_csv = "all_pairs.csv"
 
 DELIMITER = ";"
@@ -181,18 +187,41 @@ with open(new_pairs_csv, "w") as file:
 
     for r in range(1, rounds + 1):
 
-        random.shuffle(participants)
+        valid_groups_found = False
+        attempts = 0
+        
+        while not valid_groups_found and attempts < 100:
+            random.shuffle(participants)
 
-        groups = []
+            groups = []
 
-        # create groups
-        for i in range(0, len(participants), group_size):
-            groups.append(participants[i:i+group_size])
+            # create groups
+            for i in range(0, len(participants), group_size):
+                groups.append(participants[i:i+group_size])
 
-        # If the last group has only 1 person, move them to the previous group using pop and append
-        if len(groups) > 1 and len(groups[-1]) == 1:
-            last_group = groups.pop()
-            groups[-1].append(last_group[0])
+            # If the last group has only 1 person, move them to the previous group using pop and append
+            if len(groups) > 1 and len(groups[-1]) == 1:
+                last_group = groups.pop()
+                groups[-1].append(last_group[0])
+                
+            # Check if any group already exists in history
+            has_duplicate = False
+            for group in groups:
+                emails_in_group = []
+                for person in group:
+                    emails_in_group.append(person[1])
+                pair_key = tuple(sorted(emails_in_group))
+                if pair_key in opairs:
+                    has_duplicate = True
+                    break
+            
+            if not has_duplicate:
+                valid_groups_found = True
+                
+            attempts += 1
+            
+        if not valid_groups_found:
+            print(f"   ! Note: Could not find completely new groups for Round {r} (history might be full).")
 
         output_string += f"\nRound {r}"
         
@@ -221,19 +250,24 @@ with open(new_pairs_csv, "w") as file:
                 file.write(f"{r}{DELIMITER}{g+1}{DELIMITER}{name}{DELIMITER}{email}{DELIMITER}{starter}\n")
 
             output_string += "\n"
-
-            # store pair history
+        
+        # store groups in history file
+        for group in groups:
+            emails_in_group = []
+            for person in group:
+                emails_in_group.append(person[1])
             pair_key = tuple(sorted(emails_in_group))
-
             if pair_key not in opairs:
                 opairs.add(pair_key)
 
 
-# write output to console
+# write output to console and text file
 print(output_string)
+with open(new_pairs_txt, "w") as file:
+    file.write(output_string)
 
 
-# append history file
+# append history file (Jeroen: not sure why append double duplicated here)
 mode = "w"
 
 
@@ -251,8 +285,10 @@ with open(all_pairs_csv, mode) as file:
 
 print("\n----------------------------------")
 print("Pairings saved successfully!")
-print(" - New pairs file: " + new_pairs_csv)
-print(" - History file:   " + all_pairs_csv)
+print(f" -> Grab your groups from here: {new_pairs_txt}\n")
+print("Also saved data files for your records:")
+print(" - Export data:  " + new_pairs_csv)
+print(" - History data: " + all_pairs_csv + "  (Delete this file to reset group history!)")
 print("----------------------------------\n")
 print("Program finished.")
 print("Thank you for using Brew Buddy Pro!\n")
