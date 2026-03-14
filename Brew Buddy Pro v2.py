@@ -1,5 +1,7 @@
 # CHANGELOG:
 
+#v2.5 Jeroen: I noticed we had unused code to add/read topic starters. Updated the function to ask the user if they want to use custom conversation starters.
+#v2.4 Jeroen: Did some visual and textual formatting for readability.
 #v2.3 Jeroen: Added more conversation starters (AI generated topics).
 #v2.2 Jeroen: Added the function (append/pop) (again)to make the residual group more balanced.
 #v2.1 Jeroen: Added a thank you message and a link to the google sheet responses as a reminder to clear the Google Sheets.
@@ -41,6 +43,7 @@ def display_instructions():
     print("1. Fill in the Google Form")
     print("2. Download the responses as CSV")
     print("3. Place the CSV file in the same folder as this script")
+    print("4. (Optional) Place a 'conversation_starters.txt' file in this folder for custom topics (1 topic per line)")
     input("\nPress Enter when ready...")
 
 
@@ -49,26 +52,41 @@ print("----------------------------------")
 print("1. Let participants fill in the Google Form\n    (https://docs.google.com/forms/d/e/1FAIpQLSd6CeVgLXvRE5YGlkfYEkanezgUMk_-0mmGZOGv39igk2e7Lg/viewform?usp=dialog)")
 print("2. Download the responses as CSV\n    (https://docs.google.com/spreadsheets/d/1PpeRo5NwWtCWgkyHn9dRoUrztqWxIX0mFlPERe4WtIU/edit?usp=sharing)")
 print("3. Place the CSV file in this folder")
+print("4. (Optional) Place a 'conversation_starters.txt' file in this folder for custom topics (1 topic per line)")
 input("\nPress Enter to continue...")
 print("----------------------------------\n")
 
 # load conversation starters
+default_starters = [
+    "What hobby would you start if you had more time?",
+    "What is the best coffee you ever had?",
+    "If you could travel anywhere tomorrow, where would you go?",
+    "What skill would you like to learn this year?",
+    "What is a book or movie that completely changed your perspective?",
+    "If you had to eat one meal for the rest of your life, what would it be?",
+    "What is the most unexpected thing that happened to you this week?",
+    "If you could instantly become an expert in any subject, what would you choose?",
+    "What was your first job, and what did you learn from it?",
+    "What is a hidden talent you have that people usually do not know about?"
+]
+
+starters = []
 if os.path.exists("conversation_starters.txt"):
-    with open("conversation_starters.txt", "r") as f:
-        starters = f.readlines()
+    while True:
+        choice = input(">> Found 'conversation_starters.txt'. Use custom topic starters? (y/n): ").strip().lower()
+        if choice == 'y':
+            with open("conversation_starters.txt", "r") as f:
+                starters = f.readlines()
+            break
+        elif choice == 'n':
+            starters = default_starters
+            break
+        else:
+            print("   ! Please enter 'y' or 'n'.")
 else:
-    starters = [
-        "What hobby would you start if you had more time?",
-        "What is the best coffee you ever had?",
-        "If you could travel anywhere tomorrow, where would you go?",
-        "What skill would you like to learn this year?",
-        "What is a book or movie that completely changed your perspective?",
-        "If you had to eat one meal for the rest of your life, what would it be?",
-        "What is the most unexpected thing that happened to you this week?",
-        "If you could instantly become an expert in any subject, what would you choose?",
-        "What was your first job, and what did you learn from it?",
-        "What is a hidden talent you have that people usually do not know about?"
-    ]
+    starters = default_starters
+
+print() # empty line
 
 
 
@@ -114,7 +132,9 @@ emails = list(df["What is your email address?"])
 
 participants = list(zip(names, emails))
 
-print("Participants:", len(participants))
+print("\n----------------------------------")
+print(f"Total Participants loaded: {len(participants)}")
+print("----------------------------------\n")
 
 
 # choose group size and number of rounds
@@ -122,22 +142,25 @@ group_size = 0
 rounds = 0
 while not group_size > 0:
     try:
-        group_size = int(input("Enter group size (2,3,4...): "))
+        group_size = int(input("Enter group size (2, 3, 4...): "))
     except:
-        print("Something went wrong with your input, try again.")
+        print("   ! Something went wrong with your input, try again.")
+
+print() 
+
 while not rounds > 0:
     try:
-        rounds = int(input("How many rounds should be generated (2,3,4...): "))
+        rounds = int(input("How many rounds should be generated (2, 3, 4...): "))
     except:
-        print("Something went wrong with your input, try again.")
+        print("   ! Something went wrong with your input, try again.")
 
 
 
 # assemble output for printout
 output_string = ""
-output_string += "------------------------\n"
-output_string += "Generated coffee groups:\n"
-output_string += "------------------------\n"
+output_string += "\n==================================\n"
+output_string += "     GENERATED COFFEE GROUPS\n"
+output_string += "==================================\n"
 
 
 # load previous pair history
@@ -225,11 +248,14 @@ with open(all_pairs_csv, mode) as file:
                 file.write(pair[i] + "\n")
 
 
-print("\nPairings saved successfully.")
-print("New pairs file:", new_pairs_csv)
-print("History file:", all_pairs_csv)
-print("\nProgram finished.")
-print("\nThank you for using Brew Buddy Pro!")
-print("\nDon't forget to clear the google sheet responses after the script is run.")
-print("\nhttps://docs.google.com/spreadsheets/d/1PpeRo5NwWtCWgkyHn9dRoUrztqWxIX0mFlPERe4WtIU/edit?usp=sharing")
-print("\n See you next time!")
+print("\n----------------------------------")
+print("Pairings saved successfully!")
+print(" - New pairs file: " + new_pairs_csv)
+print(" - History file:   " + all_pairs_csv)
+print("----------------------------------\n")
+print("Program finished.")
+print("Thank you for using Brew Buddy Pro!\n")
+print("*** REMINDER: Don't forget to clear the google sheet responses after the script is run ***")
+print("Link to sheets: https://docs.google.com/spreadsheets/d/1PpeRo5NwWtCWgkyHn9dRoUrztqWxIX0mFlPERe4WtIU/edit?usp=sharing\n")
+print("See you next time!")
+print("----------------------------------\n")
