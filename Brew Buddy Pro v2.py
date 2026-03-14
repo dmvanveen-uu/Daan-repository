@@ -1,5 +1,6 @@
 # CHANGELOG:
 
+#v2.6 Jeroen: Added the topic starters to the output in the new_pairs.csv file. It is a bit of a messy solution but it works for now.
 #v2.5 Jeroen: I noticed we had unused code to add/read topic starters. Updated the function to ask the user if they want to use custom conversation starters.
 #v2.4 Jeroen: Did some visual and textual formatting for readability.
 #v2.3 Jeroen: Added more conversation starters (AI generated topics).
@@ -73,7 +74,7 @@ default_starters = [
 starters = []
 if os.path.exists("conversation_starters.txt"):
     while True:
-        choice = input(">> Found 'conversation_starters.txt'. Use custom topic starters? (y/n): ").strip().lower()
+        choice = input("Found 'conversation_starters.txt'. Use custom topic starters? (y/n): ").strip().lower()
         if choice == 'y':
             with open("conversation_starters.txt", "r") as f:
                 starters = f.readlines()
@@ -175,7 +176,7 @@ if os.path.exists(all_pairs_csv):
 # open new pairs csv
 with open(new_pairs_csv, "w") as file:
 
-    header = ["round", "group", "name", "email"]
+    header = ["round", "group", "name", "email", "topic"]
     file.write(DELIMITER.join(header) + "\n")
 
     for r in range(1, rounds + 1):
@@ -217,7 +218,7 @@ with open(new_pairs_csv, "w") as file:
                 output_string += f"{name} ({email}) "
 
                 # write row to CSV
-                file.write(f"{r}{DELIMITER}{g+1}{DELIMITER}{name}{DELIMITER}{email}\n")
+                file.write(f"{r}{DELIMITER}{g+1}{DELIMITER}{name}{DELIMITER}{email}{DELIMITER}{starter}\n")
 
             output_string += "\n"
 
