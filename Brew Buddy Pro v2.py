@@ -1,5 +1,6 @@
 # CHANGELOG:
 
+#v2.1 Jeroen: Added a thank you message and a link to the google sheet responses as a reminder to clear the Google Sheets.
 #v2 Daan: Added error handling for input group_size and input rounds. I think its time to commit to v2!
 #v1.11 Daan: combined seperate branch made by omar with this one + little bugfix
 #v1.10 Daan: fixed a IndentationError
@@ -216,3 +217,7 @@ print("\nPairings saved successfully.")
 print("New pairs file:", new_pairs_csv)
 print("History file:", all_pairs_csv)
 print("\nProgram finished.")
+print("\nThank you for using Brew Buddy Pro!")
+print("\nDon't forget to clear the google sheet responses after the script is run.")
+print("\nhttps://docs.google.com/spreadsheets/d/1PpeRo5NwWtCWgkyHn9dRoUrztqWxIX0mFlPERe4WtIU/edit?usp=sharing")
+print("\n See you next time!")
